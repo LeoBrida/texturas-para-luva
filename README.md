@@ -1,1 +1,1 @@
-# texturas-para-luva
+# Texturas para Luva háptica com atuadores
