@@ -40,7 +40,7 @@ Texture soft_texture;
 Texture simulatedTexture;
 
 /*const char* ssid="BRIDA_5G";
-const char* password="8406093391769430";
+const char* password="";
 WiFiServer server(80);*/ 
 
 /*
@@ -167,7 +167,7 @@ void readRawMPU(Texture simTex)
   Wire.endTransmission(false);            // termina transmissão mas continua com I2C aberto (envia STOP e START)
   Wire.requestFrom(MPU_ADDR, 14);         // configura para receber 14 bytes começando do registro escolhido acima (0x3B)
  
-  /*AcX = Wire.read() << 8;                 // lê primeiro o byte mais significativo
+  AcX = Wire.read() << 8;                 // lê primeiro o byte mais significativo
   AcX |= Wire.read();                     // depois lê o bit menos significativo
   AcY = Wire.read() << 8;
   AcY |= Wire.read();
@@ -180,39 +180,26 @@ void readRawMPU(Texture simTex)
   GyX = Wire.read() << 8;
   GyX |= Wire.read();
   GyY = Wire.read() << 8;
-  GyY |= Wire.read();*/
+  GyY |= Wire.read();
   GyZ = Wire.read() << 8;
   GyZ |= Wire.read(); 
  
   // Verificar deslocamento horizontal no eixo Z
   float displacementZ = GyZ / 131.0;
 
-  start_time = (millis()/1000);
-  Serial.println(start_time);
-  
-  if ((displacementZ > 20 || displacementZ < -20)){
-    //digitalWrite(motor_pin, HIGH);
-    //startSimulation(simTex);   
-    while (displacementZ > 20 || displacementZ < -20){
-      GyZ = Wire.read() << 8;
-      GyZ |= Wire.read();
-      displacementZ = GyZ / 131.0;
+  //start_time = (millis()/1000);
+  //Serial.println(start_time);
 
-      analogWrite(motor_pin, 255);
-      delay(simTex.thigh); // add "random"
-      analogWrite(motor_pin, 0);
-      delay(simTex.tlow);
-    }
-  }
-
-  /*// simulação de texturas, tirar daqui e colocar no loop?
+  // simulação de texturas, tirar daqui e colocar no loop?
   if (displacementZ > 20 || displacementZ < -20) {
-    //digitalWrite(motor_pin, HIGH);
-    startSimulation(simTex);   
-  } else {
-    //digitalWrite(motor_pin, LOW);
+    analogWrite(motor_pin, 255);
+    delay(simTex.thigh);
     analogWrite(motor_pin, 0);
-  }*/ 
+    delay(simTex.tlow);
+  } 
+  else {
+    analogWrite(motor_pin, 0);
+  }
 
   Serial.print("AcX = "); Serial.print(AcX / 16384.0);
   Serial.print(" | AcY = "); Serial.print(AcY / 16384.0);
@@ -221,7 +208,6 @@ void readRawMPU(Texture simTex)
   Serial.print(" | GyX = "); Serial.print(GyX / 131.0);
   Serial.print(" | GyY = "); Serial.print(GyY / 131.0);
   Serial.print(" | GyZ = "); Serial.println(GyZ / 131.0);
-  delay(300);
 
   //Apaga o display
   display.clear();
@@ -266,7 +252,7 @@ void setup() {
   drip_texture = {100, 500, 43}; //Gotejamento
   soft_texture = {1, 5, 42}; //Suavidade
 
-  //Configurando o módulo Wifi
+//Configurando o módulo Wifi
   /*Serial.println("Conectando a ");
   Serial.println(ssid);
   WiFi.mode(WIFI_STA);
@@ -291,6 +277,7 @@ void loop() {
     Serial.println(message);  
     simulatedTexture = controller(message);
   }
+
   readRawMPU(simulatedTexture);
 //Seleção por WiFi
   /*WiFiClient client;
@@ -300,30 +287,9 @@ void loop() {
     String request = client.readStringUntil('\r');
     Serial.println(request);
 
-    if (request.indexOf("harsh_roughness_texture" != -1)){
-      analogWrite() //Chamar função criada para a colocar a textura na luva
-      Serial.println("Reproduzindo Rugosidade Grossa");
-    }
-    else if (request.indexOf("fine_roughness_texture" != -1)){
-      analogWrite() //Chamar função criada para a colocar a textura na luva
-      Serial.println("Reproduzindo Rugosidade Fina");
-    }
-    else if (request.indexOf("smooth_texture" != -1)){
-      analogWrite() //Chamar função criada para a colocar a textura na luva
-      Serial.println("Reproduzindo Lisura");
-    }
-    else if (request.indexOf("drip_texture" != -1)){
-      analogWrite() //Chamar função criada para a colocar a textura na luva
-      Serial.println("Reproduzindo Gotejamento");
-    }
-    else if (request.indexOf("soft_texture" != -1)){
-      analogWrite() //Chamar função criada para a colocar a textura na luva
-      Serial.println("Reproduzindo Suavidade");
-    }
-    else if (request.indexOf("stop" != -1)){
-      analogWrite() //Chamar função criada para nenhuma textura estar implantada na luva
-      Serial.println("Reprodução finalizada");
-    }
+    requested = wifiController(request);
+    readRawMPU(requested);
+
   }*/ 
 }
 
@@ -344,31 +310,59 @@ void stopSimulation() {
   analogWrite(motor_pin, 0);
 }
 
+/*void wifiController(){
+  if (request.indexOf("harsh_roughness_texture" != -1)){
+      startSimulation(harsh_roughness_texture);
+      Serial.println("Reproduzindo Rugosidade Grossa");
+    }
+    else if (request.indexOf("fine_roughness_texture" != -1)){
+      startSimulation(fine_roughness_texture);
+      Serial.println("Reproduzindo Rugosidade Fina");
+    }
+    else if (request.indexOf("smooth_texture" != -1)){
+      startSimulation(smooth_texture);
+      Serial.println("Reproduzindo Lisura");
+    }
+    else if (request.indexOf("drip_texture" != -1)){
+      startSimulation(drip_texture);
+      Serial.println("Reproduzindo Gotejamento");
+    }
+    else if (request.indexOf("soft_texture" != -1)){
+      startSimulation(soft_texture);
+      Serial.println("Reproduzindo Suavidade");
+    }
+    else if (request.indexOf("stop" != -1)){
+      stopSimulation();
+      Serial.println("Reprodução finalizada");
+    }
+}*/
+
 Texture controller(String message){
 
   if (message.indexOf("harsh") != -1) {
     simulatedTexture = harsh_roughness_texture;
   }
 
-  /*else if (message.indexOf("fine") != -1) {
-    startSimulation(fine_roughness_texture);
+  else if (message.indexOf("fine") != -1) {
+    //startSimulation(fine_roughness_texture);
+    simulatedTexture = fine_roughness_texture;
   }
 
   else if (message.indexOf("smooth") != -1) {
-    startSimulation(smooth_texture); 
+    simulatedTexture = smooth_texture;
   }
 
   else if (message.indexOf("drip") != -1) {
-    startSimulation(drip_texture);
+    simulatedTexture = drip_texture;
   }
 
   else if (message.indexOf("soft") != -1) {
-    startSimulation(soft_texture);
+    simulatedTexture = soft_texture;
   }
 
   else if (message.indexOf("stop") != -1) {
     stopSimulation();
-  }*/
+  }
   return simulatedTexture;
 }
 
