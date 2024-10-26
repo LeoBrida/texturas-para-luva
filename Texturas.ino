@@ -1,4 +1,6 @@
 #include <Wire.h>
+#include <ESP8266WiFi.h>
+#include "SSD1306Wire.h"
 //#include <MPU6050.h>
 //#include <helper_3dmath.h>
 
@@ -22,6 +24,10 @@ struct Texture {
 
 int pwmPin = D8; 
 unsigned long start_time = 0;
+
+const char* ssid = "DIONE";
+const char* password = "flora123";
+WiFiServer server(80);
 
 String message;
 
@@ -57,7 +63,7 @@ void setup() {
   soft_texture = {1, 5, 42}; //Suavidade
 
   //Configurando o módulo Wifi
-  /*Serial.println("Conectando a ");
+  Serial.println("Conectando a ");
   Serial.println(ssid);
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
@@ -66,17 +72,27 @@ void setup() {
     delay(500);
     Serial.print(".");
   }
-  Serial.println("Conectado a rede!");
-  Serial.println(WiFi.localIP());*/
+  Serial.println("Conectado a rede: ");
+  Serial.println(WiFi.localIP());
 
 }
 
 void loop() {
-  if (Serial.available()) {  // Verifica se há dados disponíveis na serial
+  /*if (Serial.available()) {  // Verifica se há dados disponíveis na serial
     message = Serial.readString();  // Lê a string enviada pelo monitor serial
     Serial.print("Comando: ");
     Serial.println(message);  // Exibe a string no monitor serial
     controller(message);
+  }*/
+
+  WiFiClient client;
+  client = server.available();
+
+  if (client){
+    String request = client.readStringUntil('\r');
+    request.trim();
+    Serial.println(request);
+    wifiController(request);
   }
 }
 
@@ -86,50 +102,54 @@ void startSimulation(Texture texture) {
   start_time = millis();
   Serial.println(start_time);
 
-  while (true){
+  /*while (true){
   message = Serial.readString();  // Lê a string enviada pelo monitor serial
   if (message.indexOf("stop") != -1){
     Serial.print("Comando: ");
     Serial.println(message);
     stopSimulation();
     break;
-  }  
-  analogWrite(pwmPin, texture.duty_cycle);
+  }*/ 
+
+  analogWrite(pwmPin, 255);
+  delay(texture.thigh);
+  analogWrite(pwmPin, 0);
+  delay(texture.tlow);
+
   /*digitalWrite(pwmPin, HIGH);
   delay(texture.thigh);
   digitalWrite(pwmPin, LOW);
   delay(texture.tlow);*/
-  }
 }
 
 void stopSimulation() {
   analogWrite(pwmPin, 0);
 }
 
-void controller(String message){
-
-  if (message.indexOf("harsh") != -1) {
-    startSimulation(harsh_roughness_texture);
-  }
-
-  else if (message.indexOf("fine") != -1) {
-    startSimulation(fine_roughness_texture);
-  }
-
-  else if (message.indexOf("smooth") != -1) {
-    startSimulation(smooth_texture); 
-  }
-
-  else if (message.indexOf("drip") != -1) {
-    startSimulation(drip_texture);
-  }
-
-  else if (message.indexOf("fine") != -1) {
-    startSimulation(soft_texture);
-  }
-
-  else if (message.indexOf("stop") != -1) {
-    stopSimulation();
-  }
-
+void wifiController(String request){
+  if (request.indexOf("harsh_roughness_texture")!= -1){
+      startSimulation(harsh_roughness_texture);
+      Serial.println("Reproduzindo Rugosidade Grossa");
+    }
+    else if (request.indexOf("fine_roughness_texture") != -1){
+      startSimulation(fine_roughness_texture);
+      Serial.println("Reproduzindo Rugosidade Fina");
+    }
+    else if (request.indexOf("smooth_texture") != -1){
+      startSimulation(smooth_texture);
+      Serial.println("Reproduzindo Lisura");
+    }
+    else if (request.indexOf("drip_texture") != -1){
+      startSimulation(drip_texture);
+      Serial.println("Reproduzindo Gotejamento");
+    }
+    else if (request.indexOf("soft_texture") != -1){
+      startSimulation(soft_texture);
+      Serial.println("Reproduzindo Suavidade");
+    }
+    else if (request.indexOf("stop") != -1){
+      stopSimulation();
+      Serial.println("Reprodução finalizada");
+    }
+}
 
