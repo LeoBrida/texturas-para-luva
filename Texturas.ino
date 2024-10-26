@@ -17,13 +17,15 @@ https://lurchi.wordpress.com/2016/06/29/esp8266-pwm-revisited-and-reimplemented/
 */
  
 struct Texture {
+  String name;
   float thigh; //milisegundos
   float tlow; //milisegundos
-  float duty_cycle; //%
+  float frequency; //%
 };
 
 int pwmPin = D8; 
 unsigned long start_time = 0;
+float temp;
 
 const char* ssid = "DIONE";
 const char* password = "flora123";
@@ -56,11 +58,11 @@ void setup() {
   Serial.begin(9600);
   pinMode(pwmPin, OUTPUT);
   //analogWriteRange(255);
-  harsh_roughness_texture = { 45, 94, 82}; //Rugosidade Grossa
-  fine_roughness_texture = { 22, 42, 87}; //Rugosidade Fina
-  smooth_texture = { 2, 1, 171}; //Lisura
-  drip_texture = {100, 500, 43}; //Gotejamento
-  soft_texture = {1, 5, 42}; //Suavidade
+  harsh_roughness_texture = {"Harsh", 45, 94, 7.2}; //Rugosidade Grossa
+  fine_roughness_texture = { "Fine", 22, 42, 15.6}; //Rugosidade Fina
+  smooth_texture = { "Smooth", 2, 1, 333}; //Lisura
+  drip_texture = {"Drip", 100, 500, 1.7}; //Gotejamento
+  soft_texture = {"Soft", 1, 5, 166.7}; //Suavidade
 
   //Configurando o módulo Wifi
   Serial.println("Conectando a ");
@@ -78,12 +80,6 @@ void setup() {
 }
 
 void loop() {
-  /*if (Serial.available()) {  // Verifica se há dados disponíveis na serial
-    message = Serial.readString();  // Lê a string enviada pelo monitor serial
-    Serial.print("Comando: ");
-    Serial.println(message);  // Exibe a string no monitor serial
-    controller(message);
-  }*/
 
   WiFiClient client;
   client = server.available();
@@ -96,31 +92,29 @@ void loop() {
   }
 }
 
+float time(Texture texture){
+  int seconds = 5;
+  temp = (texture.frequency)*seconds;
+  return temp;
+}
 
 void startSimulation(Texture texture) {
 
+  time(texture);
   start_time = millis();
   Serial.println(start_time);
 
-  /*while (true){
-  message = Serial.readString();  // Lê a string enviada pelo monitor serial
-  if (message.indexOf("stop") != -1){
-    Serial.print("Comando: ");
-    Serial.println(message);
-    stopSimulation();
-    break;
-  }*/ 
-
+  while (temp != 0){ 
   analogWrite(pwmPin, 255);
   delay(texture.thigh);
   analogWrite(pwmPin, 0);
   delay(texture.tlow);
+  temp--; 
+  }
 
-  /*digitalWrite(pwmPin, HIGH);
-  delay(texture.thigh);
-  digitalWrite(pwmPin, LOW);
-  delay(texture.tlow);*/
+  Serial.println("Reprodução de "+ texture.name + " finalizada");
 }
+
 
 void stopSimulation() {
   analogWrite(pwmPin, 0);
