@@ -44,6 +44,7 @@ Texture soft_texture;
 
 */
 
+
 void setup() {
 
   Serial.begin(9600);
@@ -54,6 +55,19 @@ void setup() {
   smooth_texture = { 2, 1, 171}; //Lisura
   drip_texture = {100, 500, 43}; //Gotejamento
   soft_texture = {1, 5, 42}; //Suavidade
+
+  //Configurando o módulo Wifi
+  /*Serial.println("Conectando a ");
+  Serial.println(ssid);
+  WiFi.mode(WIFI_STA);
+  WiFi.begin(ssid, password);
+  while (WiFi.status() != WL_CONNECTED)
+  {
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.println("Conectado a rede!");
+  Serial.println(WiFi.localIP());*/
 
 }
 
@@ -117,10 +131,5 @@ void controller(String message){
   else if (message.indexOf("stop") != -1) {
     stopSimulation();
   }
-
-}
-
-
-
 
 
