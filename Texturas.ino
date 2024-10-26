@@ -15,13 +15,15 @@ https://lurchi.wordpress.com/2016/06/29/esp8266-pwm-revisited-and-reimplemented/
 */
  
 struct Texture {
+  String name;
   float thigh; //milisegundos
   float tlow; //milisegundos
-  float duty_cycle; //%
+  float frequency; //%
 };
 
 int pwmPin = D8; 
 unsigned long start_time = 0;
+float temp;
 
 String message;
 
@@ -32,28 +34,16 @@ Texture drip_texture;
 Texture soft_texture;
 
 
-/*
-  Avaliar a versão do ESP8266 para saber se o range vai de 0 a 255 ou 0 a 1023
-
-  Para 255 representando um duty cicle de 100%
-  harsh_roughness_texture possui 32% de duty cicle, ou seja, 82
-  fine_roughness_texture possui 34% de duty cicle, ou seja, 87
-  smooth_texture possui 67% de duty cicle, ou seja, 171
-  drip_texture possui 17% de duty cicle, ou seja, 43 (43,3)
-  soft_texture possui 16,7% de duty cicle, ou seja, 43 (42,5)
-
-*/
-
 void setup() {
 
   Serial.begin(9600);
   pinMode(pwmPin, OUTPUT);
   //analogWriteRange(255);
-  harsh_roughness_texture = { 45, 94, 82}; //Rugosidade Grossa
-  fine_roughness_texture = { 22, 42, 87}; //Rugosidade Fina
-  smooth_texture = { 2, 1, 171}; //Lisura
-  drip_texture = {100, 500, 43}; //Gotejamento
-  soft_texture = {1, 5, 42}; //Suavidade
+  harsh_roughness_texture = {"Harsh", 45, 94, 7.2}; //Rugosidade Grossa
+  fine_roughness_texture = {"Fine", 22, 42, 15.6}; //Rugosidade Fina
+  smooth_texture = {"Smooth", 2, 1, 333}; //Lisura
+  drip_texture = {"Drip",100, 500, 1.7}; //Gotejamento
+  soft_texture = {"Soft",1, 5, 166.7}; //Suavidade
 
 }
 
@@ -66,26 +56,26 @@ void loop() {
   }
 }
 
+float time(Texture texture){
+  temp = (texture.frequency)*5;
+  return temp;
+}
 
 void startSimulation(Texture texture) {
 
+  time(texture);
   start_time = millis();
   Serial.println(start_time);
 
-  while (true){
-  message = Serial.readString();  // Lê a string enviada pelo monitor serial
-  if (message.indexOf("stop") != -1){
-    Serial.print("Comando: ");
-    Serial.println(message);
-    stopSimulation();
-    break;
-  }  
-  analogWrite(pwmPin, texture.duty_cycle);
-  /*digitalWrite(pwmPin, HIGH);
+  while (temp != 0){ 
+  analogWrite(pwmPin, 255);
   delay(texture.thigh);
-  digitalWrite(pwmPin, LOW);
-  delay(texture.tlow);*/
+  analogWrite(pwmPin, 0);
+  delay(texture.tlow);
+  temp--; 
   }
+
+  Serial.println("Reprodução de "+ texture.name + " finalizada");
 }
 
 void stopSimulation() {
@@ -114,9 +104,9 @@ void controller(String message){
     startSimulation(soft_texture);
   }
 
-  else if (message.indexOf("stop") != -1) {
+  /*else if (message.indexOf("stop") != -1) {
     stopSimulation();
-  }
+  }*/
 
 }
 
