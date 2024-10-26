@@ -57,7 +57,8 @@ void loop() {
 }
 
 float time(Texture texture){
-  temp = (texture.frequency)*5;
+  int seconds = 5;
+  temp = (texture.frequency)*seconds;
   return temp;
 }
 
