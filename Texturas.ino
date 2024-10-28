@@ -1,4 +1,5 @@
 #include <Wire.h>
+#include "SSD1306Wire.h"
 //#include <MPU6050.h>
 //#include <helper_3dmath.h>
 
@@ -24,6 +25,10 @@ struct Texture {
 int pwmPin = D8; 
 float temp;
 
+const int sda_pin = D5; // definição do pino I2C SDA
+const int scl_pin = D6; // definição do pino I2C SCL
+SSD1306Wire  display(0x3c, sda_pin, scl_pin); // Inicializa o display Oled
+
 String message;
 
 Texture harsh_roughness_texture;
@@ -32,17 +37,38 @@ Texture smooth_texture;
 Texture drip_texture;
 Texture soft_texture;
 
+void initI2C() {
+  Wire.begin(sda_pin, scl_pin);
+}
+
+void telainicial(){
+
+  display.clear();
+  display.setTextAlignment(TEXT_ALIGN_CENTER);
+
+  display.setFont(ArialMT_Plain_10);
+  display.drawString(63, 1, "ESP8266");
+  display.drawString(63, 26, "Iniciando módulos...");
+  display.drawString(63, 45, "Display Oled - OK");
+  display.display();
+}
 
 void setup() {
 
   Serial.begin(115200);
   pinMode(pwmPin, OUTPUT);
+  initI2C();
+  display.init();
+  //display.flipScreenVertically();
   //analogWriteRange(255);
   harsh_roughness_texture = {"Harsh", 45, 94, 7.2}; //Rugosidade Grossa
   fine_roughness_texture = {"Fine", 22, 42, 15.6}; //Rugosidade Fina
   smooth_texture = {"Smooth", 2, 1, 333}; //Lisura
   drip_texture = {"Drip",100, 500, 1.7}; //Gotejamento
   soft_texture = {"Soft",1, 5, 166.7}; //Suavidade
+  
+  telainicial();
+  delay(1000);
 
 }
 
@@ -56,12 +82,17 @@ void loop() {
 }
 
 float time(Texture texture){
-  int seconds = 1;
+  int seconds = 5;
   temp = (texture.frequency)*seconds;
   return temp;
 }
 
 void startSimulation(Texture texture) {
+
+  display.clear();
+  display.setTextAlignment(TEXT_ALIGN_CENTER);
+  display.drawString(63, 18, "Reprodução de texturas");
+  display.display();
 
   time(texture);
   Serial.print("Tempo de inicio:");
