@@ -22,7 +22,6 @@ struct Texture {
 };
 
 int pwmPin = D8; 
-unsigned long start_time = 0;
 float temp;
 
 String message;
@@ -36,7 +35,7 @@ Texture soft_texture;
 
 void setup() {
 
-  Serial.begin(9600);
+  Serial.begin(115200);
   pinMode(pwmPin, OUTPUT);
   //analogWriteRange(255);
   harsh_roughness_texture = {"Harsh", 45, 94, 7.2}; //Rugosidade Grossa
@@ -57,7 +56,7 @@ void loop() {
 }
 
 float time(Texture texture){
-  int seconds = 5;
+  int seconds = 1;
   temp = (texture.frequency)*seconds;
   return temp;
 }
@@ -65,17 +64,19 @@ float time(Texture texture){
 void startSimulation(Texture texture) {
 
   time(texture);
-  start_time = millis();
-  Serial.println(start_time);
+  Serial.print("Tempo de inicio:");
+  Serial.println(millis()/1000);
 
-  while (temp != 0){ 
+  while (temp > 0){ 
   analogWrite(pwmPin, 255);
   delay(texture.thigh);
   analogWrite(pwmPin, 0);
   delay(texture.tlow);
   temp--; 
   }
-
+  
+  Serial.print("Tempo de fim:");
+  Serial.println(millis()/1000);
   Serial.println("Reprodução de "+ texture.name + " finalizada");
 }
 
@@ -101,7 +102,7 @@ void controller(String message){
     startSimulation(drip_texture);
   }
 
-  else if (message.indexOf("fine") != -1) {
+  else if (message.indexOf("soft") != -1) {
     startSimulation(soft_texture);
   }
 
