@@ -82,7 +82,7 @@ void loop() {
 }
 
 float time(Texture texture){
-  int seconds = 5;
+  int seconds = 3;
   temp = (texture.frequency)*seconds;
   return temp;
 }
