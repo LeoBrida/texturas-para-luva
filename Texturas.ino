@@ -37,6 +37,8 @@ Texture smooth_texture;
 Texture drip_texture;
 Texture soft_texture;
 
+Texture new_harsh_roughness_texture;
+
 void initI2C() {
   Wire.begin(sda_pin, scl_pin);
 }
@@ -66,6 +68,12 @@ void setup() {
   smooth_texture = {"Smooth", 2, 1, 333}; //Lisura
   drip_texture = {"Drip",100, 500, 1.7}; //Gotejamento
   soft_texture = {"Soft",1, 5, 166.7}; //Suavidade
+
+  new_harsh_roughness_texture = {"nova", 60, 109, 6.7}; //Rugosidade Grossa
+  /*new_fine_roughness_texture = {"NFine", 22, 42, 15.6}; //Rugosidade Fina
+  new_smooth_texture = {"NSmooth", 2, 1, 333}; //Lisura
+  new_drip_texture = {"NDrip",100, 500, 1.7}; //Gotejamento
+  new_soft_texture = {"NSoft",1, 5, 166.7}; //Suavidade*/
   
   telainicial();
   delay(1000);
@@ -137,9 +145,9 @@ void controller(String message){
     startSimulation(soft_texture);
   }
 
-  /*else if (message.indexOf("stop") != -1) {
-    stopSimulation();
-  }*/
+  else if (message.indexOf("nova") != -1) {
+    startSimulation(new_harsh_roughness_texture);
+  }
 
 }
 
