@@ -69,7 +69,7 @@ void setup() {
   drip_texture = {"Drip",100, 500, 1.7}; //Gotejamento
   soft_texture = {"Soft",1, 5, 166.7}; //Suavidade
 
-  new_harsh_roughness_texture = {"nova", 60, 109, 6.7}; //Rugosidade Grossa
+  new_harsh_roughness_texture = {"nova", 50, 99, 6.7}; //Rugosidade Grossa
   /*new_fine_roughness_texture = {"NFine", 22, 42, 15.6}; //Rugosidade Fina
   new_smooth_texture = {"NSmooth", 2, 1, 333}; //Lisura
   new_drip_texture = {"NDrip",100, 500, 1.7}; //Gotejamento
