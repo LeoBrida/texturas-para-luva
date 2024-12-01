@@ -1,19 +1,6 @@
 #include <Wire.h>
 #include "SSD1306Wire.h"
-//#include <MPU6050.h>
-//#include <helper_3dmath.h>
 
-/*
-Links úteis:
-https://randomnerdtutorials.com/esp8266-pwm-arduino-ide/
-https://arduino-esp8266.readthedocs.io/en/latest/reference.html
-https://randomnerdtutorials.com/esp8266-pinout-reference-gpios/
-https://docs.arduino.cc/learn/microcontrollers/analog-output/
-https://www.eevblog.com/forum/microcontrollers/esp8266-analogwritefreq(32000)-gives-30-1-khz-instead-of-32khz-why/
-https://electronoobs.com/eng_arduino_tut140.php
-https://github.com/khoih-prog/ESP8266TimerInterrupt
-https://lurchi.wordpress.com/2016/06/29/esp8266-pwm-revisited-and-reimplemented/
-*/
  
 struct Texture {
   String name;
