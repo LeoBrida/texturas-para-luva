@@ -59,8 +59,7 @@ void setup() {
   pinMode(pwmPin, OUTPUT);
   initI2C();
   display.init();
-  //display.flipScreenVertically();
-  //analogWriteRange(255);
+
   harsh_roughness_texture = {"Harsh", 45, 94, 7.2}; //Rugosidade Grossa
   fine_roughness_texture = {"Fine", 22, 42, 15.6}; //Rugosidade Fina
   smooth_texture = {"Smooth", 2, 1, 333}; //Lisura
@@ -82,7 +81,7 @@ void loop() {
 }
 
 float time(Texture texture){
-  int seconds = 3;
+  int seconds = 1;
   temp = (texture.frequency)*seconds;
   return temp;
 }
@@ -136,10 +135,6 @@ void controller(String message){
   else if (message.indexOf("soft") != -1) {
     startSimulation(soft_texture);
   }
-
-  /*else if (message.indexOf("stop") != -1) {
-    stopSimulation();
-  }*/
 
 }
 
